@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2016 Google Inc.
+# Copyright 2018 Patrick Hanus
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,17 +18,17 @@ import uuid
 import os
 import requests
 
-URL = os.environ.get('SIG_URL')
+URL = os.environ.get('SIGNATURE_URL')
 
 
 def test_e2e():
     assert URL
     print ("Running test against {}".format(URL))
     r = requests.get(URL)
-    assert b'Guestbook' in r.content
+    assert b'Signature' in r.content
     u = uuid.uuid4()
     data = {'content': str(u)}
-    r = requests.post(URL + '/sign', data)
+    r = requests.post(URL + '/submit', data)
     assert r.status_code == 200
     r = requests.get(URL)
     assert str(u).encode('utf-8') in r.content
