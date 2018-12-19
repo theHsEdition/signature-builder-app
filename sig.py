@@ -38,31 +38,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 # [END imports]
 
 
-## ----------  Handle Uploading multiple Files -- x doesn't work 
-
-from django.views.generic.edit import FormView
-from .forms import FileFieldForm
-
-class FileFieldView(FormView):
-    form_class = FileFieldForm
-
-    def post(self, request, *args, **kwargs):
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        files = request.FILES.getlist('file_field')
-        if form.is_valid():
-            for f in files:
-                self.uploadfile()
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-
-## ----------  Handle Uploaded File -- x doesn't work 
-## Ideally, this bit here is where the file is checked to make sure
-## it's not bad and then it's assigned the proper variable, based on the file type
-
-
+# [START upload handling fuction ]
 def uploadfile(request):
 
 data = {}
@@ -103,12 +79,10 @@ except Exception as e:
     messages.error(request,"Unable to upload file. "+repr(e))
 
 return HttpResponseRedirect(reverse("myapp:upload_csv"))
+# [END upload handling fuction ]
 
 
-### ---------- This part works -----------------------
-### This is where the processesing happens.
-
-
+# [START templating fuction ] --------- This part works -------------
 
 # I want this to be a funtion that is called, passing the values into the function
 def compile_data( htm_template_path, csv_data_path ):
@@ -145,6 +119,28 @@ def compile_data( htm_template_path, csv_data_path ):
         
     # Print the number of files created as a cue program has finished.
     print(str(input_file.line_num - 1) + ' files were created.')        
+
+
+
+# [START Form fuction ] ----------  Handle Uploading multiple Files -- x doesn't work yet
+
+from django.views.generic.edit import FormView
+from .forms import FileFieldForm
+
+class FileFieldView(FormView):
+    form_class = FileFieldForm
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        files = request.FILES.getlist('file_field')
+        if form.is_valid():
+            for f in files:
+                self.uploadfile()
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+# [END Form fuction ]
 
 # [START main_page]
 class MainPage(webapp2.RequestHandler):
