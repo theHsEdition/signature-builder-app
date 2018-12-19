@@ -33,6 +33,44 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True)
 # [END imports]
 
+# [START templating fuction ] --------- This part works -------------
+
+# I want this to be a funtion that is called, passing the values into the function
+def compile_data( htm_template_path, csv_data_path ):
+    if __name__ == '__main__':
+
+        # Open template file and pass string to 'data'.
+        # Will be in HTML format except with the string.Template replace
+        # tags with the format of '$var'. The 'var' MUST correspond to the
+        # items in the heading row of the input CSV file.
+        with open( htm_template_path , 'r') as my_template:
+            data = my_template.read()
+            # Print template for visual cue.
+            print('Template loaded:')
+            print(data)
+            # Pass 'data' to string.Template object data_template.
+            data_template = string.Template(data)
+
+        # Open the input CSV file and pass to dictionary 'input_file'
+        with open(csv_data_path,) as csv_file:
+            input_file = csv.DictReader(csv_file, delimiter=',')
+
+            for row in input_file:
+
+                    # Create filenames for the output HTML files
+                    filename = row['fname'] + row['lname'] + '.htm'
+                    # Print filenames for visual cue.
+                    print(filename)
+                    # Create output HTML file.
+                    with open(filename, 'w') as output_file:
+                        # Run string.Template substitution on data_template
+                        # using data from 'row' as source and write to
+                        # 'output_file'.
+                        output_file.write(data_template.substitute(row))
+        
+    # Print the number of files created as a cue program has finished.
+    print(str(input_file.line_num - 1) + ' files were created.')
+    
 
 # [START upload handling fuction ]
 def uploadfile(request):
@@ -74,46 +112,7 @@ def uploadfile(request):
         messages.error(request,"Unable to upload file. "+repr(e))
 
     return HttpResponseRedirect(reverse("myapp:upload_csv"))
-# [END upload handling fuction ]
-
-
-# [START templating fuction ] --------- This part works -------------
-
-# I want this to be a funtion that is called, passing the values into the function
-def compile_data( htm_template_path, csv_data_path ):
-    if __name__ == '__main__':
-
-        # Open template file and pass string to 'data'.
-        # Will be in HTML format except with the string.Template replace
-        # tags with the format of '$var'. The 'var' MUST correspond to the
-        # items in the heading row of the input CSV file.
-        with open( htm_template_path , 'r') as my_template:
-            data = my_template.read()
-            # Print template for visual cue.
-            print('Template loaded:')
-            print(data)
-            # Pass 'data' to string.Template object data_template.
-            data_template = string.Template(data)
-
-        # Open the input CSV file and pass to dictionary 'input_file'
-        with open(csv_data_path,) as csv_file:
-            input_file = csv.DictReader(csv_file, delimiter=',')
-
-            for row in input_file:
-
-                    # Create filenames for the output HTML files
-                    filename = row['fname'] + row['lname'] + '.htm'
-                    # Print filenames for visual cue.
-                    print(filename)
-                    # Create output HTML file.
-                    with open(filename, 'w') as output_file:
-                        # Run string.Template substitution on data_template
-                        # using data from 'row' as source and write to
-                        # 'output_file'.
-                        output_file.write(data_template.substitute(row))
-        
-    # Print the number of files created as a cue program has finished.
-    print(str(input_file.line_num - 1) + ' files were created.')        
+# [END upload handling fuction ] 
 
 # [START main_page]
 class MainPage(webapp2.RequestHandler):
@@ -131,8 +130,7 @@ class MainPage(webapp2.RequestHandler):
 class SignatureBuilder(webapp2.RequestHandler):
 
     def post(self):
-        
-        signature.put()
+        return self.uploadfile()
 
         query_params = {'signature_builder': signature_builder}
         self.redirect('/?' + urllib.urlencode(query_params))

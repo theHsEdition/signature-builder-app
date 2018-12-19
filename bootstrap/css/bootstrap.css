@@ -6164,8 +6164,8 @@ a.badge:focus {
 }
 
 
-/* Upload button */
-.upload-btn-wrapper {
+/* Upload button - I will style this later */ 
+/*.upload-btn-wrapper {
   position: relative;
   overflow: hidden;
   display: inline-block;
@@ -6188,7 +6188,13 @@ a.badge:focus {
   top: 0;
   opacity: 0;
   cursor: pointer;
+  width: 100%;
+  height: 100%;
 }
+
+.upload-btn-wrapper input[type=file]:valid {
+ background-color: green;
+}*/
 
 input[type=submit] {
   border: none;
@@ -6197,7 +6203,14 @@ input[type=submit] {
   padding: 8px 20px;
   border-radius: 8px;
   font-size: 15px;
+  transition: 0.5s;
 }
+
+input[type=submit]:hover {
+  box-shadow: 0px 0px 15px 5px #cfcfcf;
+  transition: 0.5s;
+}
+
 
 .next-btn {
   display: block;
