@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <head>
+    <!-- [START css] -->
+    <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+    <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap-responsive.css">
+    <!-- [END css] -->
+  </head>
+  
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">Signature Builder Pro</a>
+          <div class="nav-collapse collapse pull-right">
+            <a href="{{ url|safe }}" class="btn">{{ url_linktext }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- [START greetings] -->
+      <br>
+      <h1>Create Email Signatures for Everyone at your company in an instant.</h1>
+      <br>
+      <p>Let's get started! Here's what you'll need:</p>
+      <p>1. A CSV of you contacts</p>
+      <p>2. An HTML template for how you what your signature to look</p>
+      <!-- [END greetings] -->
+
+      <hr>
+
+      
+        <h3>1. Upload a CSV file of everyone who needs a signature.</h3>
+        <p>Make sure you have consistant column names, i.e. first-name, last-name, cell-phone...</p>
+        
+        <form action="/submit?signature_builder={{ signature_builder }}" method="post" enctype="multipart/form-data">
+          <div class="upload-btn-wrapper">
+            <button class="upload-btn">Choose CSV...</button>
+
+            <!-- 1. Upload csv file of data -->
+            <input type="file" name="upload" />
+            <!-- end step 1 -->
+          </div>
+
+          <div class="upload-btn-wrapper">
+            <button class="upload-btn">Choose HTML Template File...</button>
+
+            <!-- 2. Upload html file w/ variables -->
+            <input type="file" name="upload" />
+            <!-- end step 2 -->
+          </div>
+          
+          <div class="next-btn">
+              <input type="submit" name="next" value="Next &rarr;" />
+          </div>
+        </form>
+      
+
+    </div>
+  </body>
+</html>
+{% endautoescape %}
