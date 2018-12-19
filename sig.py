@@ -24,10 +24,6 @@ from google.appengine.ext import ndb
 import jinja2
 import webapp2
 
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from .forms import UploadFileForm
-
 import csv
 import string
 
@@ -40,45 +36,44 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 # [START upload handling fuction ]
 def uploadfile(request):
+    data = {}
 
-data = {}
+    if "GET" == request.method:
+        return render(request, "/", data)
 
-if "GET" == request.method:
-    return render(request, "myapp/upload_files.html", data)
+    # if not GET, then proceed
+    try:
+        uploadFile = request.FILES["csv_file1"]
+        
+        # if file is csv
+        if uploadFile.name.endswith('.csv'):
+            csv_data_path = uploadFile
+        # if file is htm or html
+        if uploadFile.name.endswith('.htm', '.html'):
+            htm_template_path = uploadFile
 
-# if not GET, then proceed
-try:
-    uploadFile = request.FILES["csv_file1"]
-    
-    # if file is csv
-    if uploadFile.name.endswith('.csv'):
-        csv_data_path = uploadFile
-    # if file is htm or html
-    if uploadFile.name.endswith('.htm', '.html'):
-        htm_template_path = uploadFile
+        # if the file is not the correct type, regect it.
+        else:
+            messages.error(request,'File is not CSV or Html type')
+            return HttpResponseRedirect(reverse("myapp:upload_files"))
 
-    # if the file is not the correct type, regect it.
-    else:
-        messages.error(request,'File is not CSV or Html type')
-        return HttpResponseRedirect(reverse("myapp:upload_files"))
+        # if file is too large, return
+        if uploadFile.multiple_chunks():
+            messages.error(request,"Uploaded file is too big (%.2f MB)." % (uploadFile.size/(1000*1000),))
+            return HttpResponseRedirect(reverse("myapp:upload_csv"))
 
-    # if file is too large, return
-    if uploadFile.multiple_chunks():
-        messages.error(request,"Uploaded file is too big (%.2f MB)." % (uploadFile.size/(1000*1000),))
-        return HttpResponseRedirect(reverse("myapp:upload_csv"))
+        # Skip empty lines
+        file_data = csv_data_path.read().decode("utf-8")
+        lines = file_data.split("\n")
 
-    # Skip empty lines
-    file_data = csv_data_path.read().decode("utf-8")
-    lines = file_data.split("\n")
+        # Use the compile function I wrote
+        compile_data( htm_template_path, lines )
 
-    # Use the compile function I wrote
-    compile_data( htm_template_path, lines )
+    except Exception as e:
+        logging.getLogger("error_logger").error("Unable to upload file. "+repr(e))
+        messages.error(request,"Unable to upload file. "+repr(e))
 
-except Exception as e:
-    logging.getLogger("error_logger").error("Unable to upload file. "+repr(e))
-    messages.error(request,"Unable to upload file. "+repr(e))
-
-return HttpResponseRedirect(reverse("myapp:upload_csv"))
+    return HttpResponseRedirect(reverse("myapp:upload_csv"))
 # [END upload handling fuction ]
 
 
@@ -120,35 +115,12 @@ def compile_data( htm_template_path, csv_data_path ):
     # Print the number of files created as a cue program has finished.
     print(str(input_file.line_num - 1) + ' files were created.')        
 
-
-
-# [START Form fuction ] ----------  Handle Uploading multiple Files -- x doesn't work yet
-
-from django.views.generic.edit import FormView
-from .forms import FileFieldForm
-
-class FileFieldView(FormView):
-    form_class = FileFieldForm
-
-    def post(self, request, *args, **kwargs):
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        files = request.FILES.getlist('file_field')
-        if form.is_valid():
-            for f in files:
-                self.uploadfile()
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-# [END Form fuction ]
-
 # [START main_page]
 class MainPage(webapp2.RequestHandler):
 
     def get(self):
         template_values = {
             'url': '/',
-            'url_linktext': url_linktext,
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -159,8 +131,7 @@ class MainPage(webapp2.RequestHandler):
 class SignatureBuilder(webapp2.RequestHandler):
 
     def post(self):
-
-        greeting.content = self.request.get('content')
+        
         signature.put()
 
         query_params = {'signature_builder': signature_builder}
