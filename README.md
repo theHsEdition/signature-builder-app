@@ -41,7 +41,7 @@ To manually run, install the requirements
 
 Set the environment variable to point to your deployed app:
 
-    export GUESTBOOK_URL="http://guestbook-test-dot-useful-temple-118922.appspot.com/"
+    export GUESTBOOK_URL="http://signature-builder-app.appspot.com"
 
 Finally, run the test
 

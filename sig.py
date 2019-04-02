@@ -1,18 +1,6 @@
 #!/usr/bin/env python
 
 # Copyright 2018 Patrick Hanus
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 # [START imports]
 import os
@@ -90,7 +78,7 @@ def uploadfile(request):
         if uploadFile.name.endswith('.htm', '.html'):
             htm_template_path = uploadFile
 
-        # if the file is not the correct type, regect it.
+        # if the file is not the correct type, reject it.
         else:
             messages.error(request,'File is not CSV or Html type')
             return HttpResponseRedirect(reverse("myapp:upload_files"))
@@ -128,6 +116,16 @@ class MainPage(webapp2.RequestHandler):
 
 # [START Signature Builder]
 class SignatureBuilder(webapp2.RequestHandler):
+
+    def post(self):
+        return self.uploadfile()
+
+        query_params = {'signature_builder': signature_builder}
+        self.redirect('/?' + urllib.urlencode(query_params))
+# [END Signature Builder]
+
+# [START Signature Builder]
+class DownloadPage(webapp2.RequestHandler):
 
     def post(self):
         return self.uploadfile()
